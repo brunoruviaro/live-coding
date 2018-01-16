@@ -1,0 +1,69 @@
+
+
+Ndef(\waves).play;
+Ndef(\waves).fadeTime = 5;
+
+
+(
+Ndef(\waves, { arg freq=100, amp=0.3;
+	var facs = Array.rand(5, 0.99, 1.01);
+	var waves = [
+		SinOsc.ar(freq: 8*freq*facs, mul: amp*2).distort,
+		Pulse.ar(freq: freq*facs, mul: amp),
+		Saw.ar(freq: freq*facs, mul: amp),
+		SinOsc.ar(freq: freq*facs*2, mul: amp).distort,
+		Pulse.ar(freq: freq*facs*3, mul: amp),
+		LFSaw.ar(freq: freq*facs*4, mul: amp);
+		];
+	var numW = waves.size;
+	// var snd = Select.ar(MouseX.kr(0, numW-1).round(1), waves);
+	var snd = Select.ar(LFNoise0.kr(6).range(0, numW-1).round(1), waves);
+	snd = Splay.ar(snd);
+	snd = snd.distort;
+	snd = 
+	(snd * SinOsc.ar(1/6).range(0.1, 1)) 
+	+
+	RLPF.ar(snd, LFNoise1.kr(1).range(400, 5000), 0.3);
+	// snd = snd + CombC.ar(snd, 1, 0.15, Rand(0.1, 0.21));
+	snd = snd + Normalizer.ar(snd, LFPulse.kr(5).range(0.1, 0.8));
+
+})
+)
+
+Ndef(\freqs, { LFSaw.kr(1/5).range(50, 90).round(10) });
+
+Ndef(\waves).map(\freq, Ndef(\freqs));
+
+Ndef(\waves).set(\amp, 0.9);
+
+
+Ndef(\waves2).play;
+Ndef(\waves2).set(\amp, 0.1);
+Ndef(\freqs2, { LFNoise0.kr(10).range(100, 1500).round(100) });
+Ndef(\waves2).map(\freq, Ndef(\freqs2))
+
+(
+Ndef(\waves2, { arg freq=1000, amp=0.03;
+	var facs = Array.rand(5, 0.94, 1.02);
+	var waves = [
+		SinOsc.ar(freq: 4*freq*facs, mul: amp*2).distort,
+		Pulse.ar(freq: 2*freq*facs, mul: amp),
+		Saw.ar(freq: freq*facs, mul: amp),
+		SinOsc.ar(freq: freq*facs*2, mul: amp).distort,
+		Pulse.ar(freq: freq*facs*3, mul: amp),
+		LFSaw.ar(freq: freq*facs*4, mul: amp);
+		];
+	var numW = waves.size;
+	// var snd = Select.ar(MouseX.kr(0, numW-1).round(1), waves);
+	var snd = Select.ar(LFNoise0.kr(3).range(0, numW-1).round(1), waves);
+	snd = Splay.ar(snd);
+	snd = snd.distort;
+	snd = 
+	(snd * SinOsc.ar(1/6).range(0.1, 1)) 
+	+
+	RHPF.ar(snd, LFNoise1.kr(1).range(100, 300), 0.3);
+	// snd = snd + CombC.ar(snd, 1, 0.15, Rand(0.1, 0.21));
+
+})
+)
+
