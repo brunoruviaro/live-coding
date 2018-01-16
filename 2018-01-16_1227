@@ -1,0 +1,53 @@
+
+a = Scale.major;
+a.tuning_(\just);
+
+Ndef(\chord1).play;
+Ndef(\chord1).fadeTime = 5;
+a.size
+(
+Ndef(\chord1, { 
+	arg freq=110, amp=0.1;	
+	b = (freq.cpsmidi + a.semitones) + (Array.rand(a.size, 0, 1) * 12);
+	b = b.round(0.001).midicps;
+	o = SinOsc.ar(freq: b * [1, 1.01], mul: SinOsc.kr(1/[1, 2, 3, 4, 5].scramble).range(0.0, 0.6));
+	o = o + Pulse.ar([1100, 1400]*0.5, rrand(0.1, 0.5), rrand(0.01, 0.05));
+	o = Splay.ar(o);
+})
+)
+
+Ndef(\chord1).clear(20);
+
+
+
+
+Ndef(\chord1, {Pulse.ar([1100, 1400]*[0.5, 1.0].choose, width: 0.9, mul: 0.1)})
+
+
+
+Ndef(\test, {SinOsc.ar(1000+[500, -100, 100, 200, 0, 0].choose * [1, rrand(1.001, 1.0051)], 0, LFPulse.kr(MouseX.kr(1, 5)).range(0.01, 0.21))});
+
+(
+t = SystemClock.sched(0, {
+	
+	Ndef(\test, {SinOsc.ar(1000+[-500, -100, 100, 200, 0, 0].choose * [1, rrand(1.001, 1.0051)], 0, LFPulse.kr(MouseX.kr(1, 5)).range(0.1, 0.2))});
+	rrand(0.5, 4);
+
+}
+)
+)
+
+t.clear;
+
+
+
+Ndef(\test).play;
+Ndef(\test).fadeTime = 0;
+Ndef(\test).clear(3);
+
+
+
+
+
+
+	
