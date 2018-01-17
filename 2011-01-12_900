@@ -1,0 +1,26 @@
+Ndef(\drops).play;
+Ndef(\drops).fadeTime = 4;
+
+(
+Ndef(\drops,{
+	var trig, snd;
+	trig = TDuty.ar(
+		dur: Dseq([0.1, 0.1, 0.1, 0.2], inf),
+		reset:  0,
+		level: 0.9, //Dseq([0.1, 0.4, 0.01, 0.5, 1.0], inf) // demand ugen as amplitude
+	);
+	snd = Ringz.ar(
+		in: trig,
+		// freq: MouseX.kr(1000, 4000)*[1, 1.3],
+		freq: Demand.ar(trig, 0,
+			Dseq([72, 73, 77, 78, Drand([79, 85])], inf)
+			+ MouseX.kr(-0.5, 0.1)
+			+ LFPulse.kr(1/5,0,0.5).range(-12, 0)
+			+ SinOsc.kr(1/2)
+		).midicps,
+		decaytime: [0.1, 0.1]);
+	snd = CombN.ar(snd, 0.5, Rand(0.1, 0.3), 1);
+	snd = FreeVerb.ar(snd, 0.3, 0.6);
+
+});
+)
