@@ -1,0 +1,40 @@
+
+
+// make sure audio file is saved in same folder as this file
+b = Buffer.read(s, "".resolveRelative ++ "loveme.wav");
+b.numChannels
+b.play
+
+Ndef(\b).play;
+
+Ndef(\b).fadeTime = 2;
+Ndef(\b).clear(1)
+// Ndef(\b, { Pbind() });
+Ndef(\b, { SinOsc.ar([110, 111],0,0.1) })
+b.duration
+
+Ndef(\i, {Impulse.kr([4, 1])});
+
+Ndef(\l, { Line.kr(1.1, 1, 30) });
+
+(
+Ndef(\b, {
+	var snd = TGrains2.ar(
+		numChannels: 2,
+		// trigger: Impulse.kr([1, 2]),
+		trigger: Ndef(\i),
+		bufnum: b,
+		rate: 1 * [1, 4, 1,1.0015],// * LFPulse.kr(1/2).range(-1, 1) * Ndef(\l),
+		centerPos: LFSaw.kr(1/7).range(0, 1) * b.duration,
+		dur: 2,
+		pan: SinOsc.kr(1.1),
+		amp: 0.4,
+		att: 0.1,
+		dec: 0.1
+	);
+	// snd.postln;
+	// snd.flat.postln;
+	Splay.ar(snd.flat);
+
+})
+)
