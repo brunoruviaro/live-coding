@@ -1,0 +1,20 @@
+
+
+Ndef(\a).play;
+Ndef(\a).fadeTime = 1;
+(
+Ndef(\a, {|freq=100,amp=0.1|
+	var s=Saw.ar(
+	freq:freq*[1.01,1,1.5,2.01,2.2,5,7],
+	mul:amp*LFPulse.ar([3,2,4,1,7]).range(0.5,1));
+	s*1/SinOsc.ar(Array.rand(5, 1,9)).max(0);
+	s = BPF.ar(s, LFNoise0.kr([1, 2, 3, 4]).range(100, 1000), MouseX.kr(0.3, 0.5)) * 5;
+	s=Splay.ar(s);
+
+})
+)
+Ndef(\a).set(\freq, 110, \amp, 0.5)
+
+Ndef(\a).quant = 1;
+
+Ndef.clear(4);
