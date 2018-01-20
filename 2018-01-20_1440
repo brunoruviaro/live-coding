@@ -1,0 +1,52 @@
+b = Buffer.read(s, "/home/ruviaro/Downloads/live-coding-master/loveme.wav");
+
+
+Ndef.all
+b.numChannels;
+Ndef(\x).clear
+Ndef(\x).fadeTime = 4;
+Ndef(\x, { FreeVerb.ar(PlayBuf.ar(1, b, [-0.25, 0.25], 1, 0, 1) * SinOsc.ar(1/[5, 8]).range(0.5, 1), 0.4, 0.7, 0.4, 2) }).play;
+
+Ndef.clear(4);
+
+Ndef(\source).fadeTime = 8;
+Ndef(\source, {PlayBuf.ar(1, b, [-0.5, -0.25, 0.25, 0.25], 1, 0, 1)*[1, 1, 0.5]});
+Ndef(\source).clear(10);
+
+Ndef(\test, { SinOsc.ar(200) * LFPulse.kr(1) * 0.4});
+
+(
+Ndef(\x, { SinOsc.ar([100, 102], 0, 0.4)
+}).play;
+)
+
+Ndef(\x).clear(3)
+(
+Ndef(\y, { Ndef.ar(\source)
+}).play;
+)
+
+Ndef(\y).fadeTime = 4;
+(
+Ndef(\y, { 
+	var snd, in = Ndef.ar(\source);
+	var snd2 = BPF.ar(PitchShift.ar(in, 0.2, [1.2, 2, 3]), SinOsc.ar(1/6).range(100, 5900), 0.21) * LFPulse.ar(5) * 5;
+	in = in + CombC.ar(snd2, 1, 0.5, 6);
+	snd = FreeVerb.ar(
+		in: snd2 + in,
+		mix: 0.33,
+		room: 0.4,
+		damp: 0.5,
+		mul: 2);
+	snd = Limiter.ar(snd)
+}).play;
+)
+
+
+Ndef(\ww, {PlayBuf.ar(1, b, LFNoise2.kr(5).range(2, 5), 1, 0, 1) * LFPulse.kr(LFNoise0.kr(1).range(1, 4)) * SinOsc.kr(1/40)});
+
+Ndef(\ww).play;
+
+
+Ndef.clear(10)
+
