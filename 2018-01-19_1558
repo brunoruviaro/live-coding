@@ -1,0 +1,48 @@
+
+
+Ndef(\tr, { Impulse.kr(6) });
+Ndef(\bass).fadeTime = 0;
+Ndef(\bass).play;
+(
+Ndef(\bass, { arg freq=110, amp=0.4;
+	var t, snd, env, notes;
+	t = Ndef(\tr);
+	notes = Dseq([0, 3, 5, 14], inf) + freq.cpsmidi;
+	notes = Demand.kr(t, 0, notes).midicps;
+	notes = notes.lag(0.09);
+	env = Env.perc(releaseTime: 1.3).kr(0, t);
+	snd = LFSaw.ar(notes * [1, 2, 3, 1.5], mul: amp * [1, 0.4, 0.2, 0.3] * env);
+	snd = LFPulse.kr([2, 1, 1, 2]) * snd;
+	snd = Splay.ar(RLPF.ar(snd, 1000, 0.1));
+	snd = snd + FreeVerb.ar(snd);
+})
+)
+
+
+Ndef(\f, { LFNoise2.kr(1/4).range(50, 120).round(20) });
+
+Ndef(\wr).play;
+
+Ndef(\wr).map(\freq, Ndef(\f))
+
+(
+Ndef(\wr, { arg freq=120, amp=0.31;
+	var t, snd, env, notes;
+	t = Ndef(\tr);
+	notes = Dseq([0, 3, 5, Drand([14, 19], 1), 0], inf) + freq.cpsmidi;
+	notes = Demand.kr(t, 0, notes).midicps;
+	notes = notes.lag(0.1);
+	env = Env.perc(releaseTime: 0.3).kr(0, t);
+	snd = LFPulse.ar(notes, mul: amp * env);
+	// snd = LFPulse.kr([1, 2, 1]) * snd;
+	snd = Splay.ar(RHPF.ar(snd, 50, 0.1));
+	snd = FreeVerb.ar(snd);
+})
+)
+
+s.plotTree
+
+
+Ndef(\bass).clear(0)
+Ndef(\bass).play
+Ndef(\bass).set(\freq, 80, \amp, 0.25);
