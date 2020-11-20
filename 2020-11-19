@@ -1,0 +1,24 @@
+(
+Ndef(\a, { var snd;
+	var env;
+	var detune = Array.rand(8, 0.99, 1.01);
+	snd = SinOsc.ar([50, 110, 220, 330, 441] * detune) * Ndef(\h).kr;
+	snd = snd.clip(-1, 1);
+	snd = snd * SinOsc.ar(1/[2, 3, 4]).range(0.05, 0.1);
+	
+	snd = (snd.distort * 10).clip(-1, 1) * 0.05;
+	snd = RLPF.ar(
+		in: snd, 
+		freq: LFTri.ar(1/[5, 7, 3]).range(300, 2300),
+		rq: 0.3
+	);
+	env = Env.perc(0.01, Array.rand(8, 1, 4)).kr(gate: Dust.kr([1, 2, 4]));
+	snd = snd * env;
+	snd = Splay.ar(snd);
+	});
+)
+
+Ndef(\h, { LFNoise0.kr(3).range(2, 16).round(1) })
+
+Ndef(\a).fadeTime = 5;
+Ndef(\a).play;
