@@ -89,8 +89,8 @@ Ndef(\a, {
 		pos: Demand.ar(
 			trig: trig,
 			reset: 0,
-			// demandUGens: Dseq([0.22, 0.4, 0.67, 0.68], inf)
-			demandUGens: Dseq(Array.series(14, 0.01, 0.1), inf).min(0.99)
+			demandUGens: Dseq([0.22, 0.4, 0.67, 0.68], inf)
+			// demandUGens: Dseq(Array.series(14, 0.01, 0.1), inf).min(0.99)
 		)
 		,
 		interp: 4,
@@ -108,19 +108,19 @@ Ndef(\a, {
 
 // machine music
 (
-Ndef(\a).fadeTime = 2;
+Ndef(\a).fadeTime = 0;
 Ndef(\a, {
 	var snd;
 	var win;
 	var sample = b;
-	var trig = Impulse.ar(XLine.kr(20, 3, 20));
+	var trig = Impulse.ar(21);
 
 	snd = GrainBuf.ar(
 		numChannels: 2,
 		trigger: trig,
-		dur: Array.rand(4, 0.09, 0.39),
+		dur: Array.rand(4, 0.09, 0.19),
 		sndbuf: sample,
-		rate: [0.75, 1, 1.5] * LFPulse.ar(1/5, 0, 0.9).range([0.5, 0.25], 1),
+		rate: [0.75, 1, 1.5],// * LFPulse.ar(1/5, 0, 0.9).range([0.5, 0.25], 1),
 		pos: Demand.ar(
 			trig: trig,
 			reset: 0,
@@ -135,10 +135,10 @@ Ndef(\a, {
 	);
 
 	snd = Splay.ar(snd);
-	snd = Normalizer.ar(snd, 0.65, 0.3);
-	snd = FreeVerb.ar(snd, 0.4, 0.5);
+	snd = FreeVerb.ar(snd, 0.4, 0.8);
 	snd = Limiter.ar(snd)// * Ndef.ar(\vol, 1) * 0.85;
 }).play;
+Ndef(\a).quant_(1)
 )
 
 
@@ -196,7 +196,6 @@ Ndef(\a, {
 	);
 
 	snd = snd + RHPF.ar(snd, 135 * [0, 2, 9].midiratio * 6, 0.05);
-	snd = Normalizer.ar(snd, 0.5, 0.1);
 	snd = FreeVerb.ar(snd, 0.54, 0.85);
 	snd = Limiter.ar(snd)// * Ndef.ar(\vol, 1) * 0.85;
 }).play;
@@ -205,7 +204,7 @@ Ndef(\a, {
 
 // gliss up, rhythmic
 (
-Ndef(\a).fadeTime = 6;
+Ndef(\a).fadeTime = 1;
 Ndef(\a, {
 	var snd;
 	var win;
@@ -213,10 +212,10 @@ Ndef(\a, {
 
 	snd = GrainBuf.ar(
 		numChannels: 2,
-		trigger: Impulse.ar([3,5] * SinOsc.ar(1/2).range(0.5, 14)),
+		trigger: Impulse.ar([3,5]) * SinOsc.ar(1/2).range(0.5, 4),
 		dur: Array.rand(4, 0.07, 0.1) * LFPulse.ar(1/4, 0, 0.29).range(1, 4),
 		sndbuf: sample,
-		rate: [0.999, 1, 1.01] * LFPulse.ar(1/5, 0, 0.9).range([0.5, 0.25], 1) * XLine.ar(0.35, 0.39, 14),
+		rate: [0.999, 1, 1.01] * LFPulse.ar(1/5, 0, 0.9).range([0.5, 0.25], 1) * XLine.ar(0.5, 2.99, 4),
 		pos: [0.22, [0.21, 0.24, 0.4, 0.12, 0.99].choose]
 		,
 		interp: 4,

@@ -1,10 +1,14 @@
 Ndef.clear(10)
 
-
+(
 b = Buffer.read(s, "".resolveRelative ++ "QL_Brasileirinho_111622.wav");
+e = Env.perc(0.01, 1); //Env([0, 1, 0], [0.5, 0.5], [8, -8]);
+z = Buffer.sendCollection(s, e.discretize, 1);
+)
 
-b.play
+// b.play
 
+Ndef.clear(12);
 
 
 // nice alternate intro, sparse take on the intro
@@ -14,7 +18,7 @@ Ndef(\a, {
 	var snd;
 	var win;
 	var sample = b;
-	var trig = Impulse.ar(1 * [1, 2, 4]);
+	var trig = Impulse.ar(1/2 * [1.1, 2] * LFTri.ar(1/[1,3]).range(0.13, 1));
 
 	snd = GrainBuf.ar(
 		numChannels: 2,
@@ -33,7 +37,40 @@ Ndef(\a, {
 	);
 	snd = Splay.ar(snd.flat);
 	snd = HPF.ar(snd, LFNoise2.ar(3).range(100, 2000));
-	// snd = Normalizer.ar(snd, 0.4, 0.1);
+	snd = Normalizer.ar(snd, 0.4, 0.1);
+	snd = FreeVerb.ar(snd, 0.4, 0.78);
+	snd = Limiter.ar(snd)// * Ndef.ar(\vol, 1) * 0.85;
+}).play;
+)
+
+
+
+// stretched grainy cloud intro
+(
+Ndef(\a).fadeTime = 2;
+Ndef(\a, {
+	var snd;
+	var win;
+	var sample = b;
+	var trig = Impulse.ar(2 * [1, 2, 4, 3.2]);
+
+	snd = GrainBuf.ar(
+		numChannels: 2,
+		trigger: trig,
+		dur: [7, 2, 4.3, 5] / 3,
+		sndbuf: sample,
+		rate: 1 , //* Env.triangle(3).ar(gate: Impulse.ar(1/3), levelBias: 0.5).poll,
+		pos:
+		// 0.48
+		// [0.27, 0.20, 0.15]
+		LFSaw.ar(1/10).range(0.06, 0.169) // scan the intro over x seconds
+		,
+		interp: 4,
+		pan: LFNoise0.ar(2).range(-0.5, 0.5),
+		mul: 1
+	);
+	snd = Splay.ar(snd.flat);
+	snd = Normalizer.ar(snd, 0.64, 0.3);
 	snd = FreeVerb.ar(snd, 0.4, 0.78);
 	snd = Limiter.ar(snd)// * Ndef.ar(\vol, 1) * 0.85;
 }).play;
@@ -42,19 +79,19 @@ Ndef(\a, {
 
 // post intro, recognizable loop
 (
-Ndef(\a).fadeTime = 25;
+Ndef(\a).fadeTime = 2;
 Ndef(\a, {
 	var snd;
 	var win;
 	var sample = b;
-	var trig = Impulse.ar(1/3);
+	var trig = Impulse.ar(1/4);
 
 	snd = GrainBuf.ar(
 		numChannels: 2,
 		trigger: trig,
-		dur: [5, 6.3],
+		dur: [8, 8.1],
 		sndbuf: sample,
-		rate: 1, //* Env.triangle(5).ar(gate: Impulse.ar(1), levelBias: 0.5).poll,
+		rate: [1, 1.001], // * Env.triangle(5).ar(gate: Impulse.ar(1), levelBias: 0.5).poll,
 		pos:
 		0.45
 		// [0.47, 0.50, 0.55]
@@ -64,33 +101,35 @@ Ndef(\a, {
 		mul: 1
 	);
 	snd = Splay.ar(snd.flat);
-	// snd = Normalizer.ar(snd, 0.4, 0.1);
-	snd = FreeVerb.ar(snd, 0.4, 0.58);
+	snd = Normalizer.ar(snd, 0.64, 0.01);
+	snd = FreeVerb.ar(snd, 0.4, 0.5);
 	snd = Limiter.ar(snd)// * Ndef.ar(\vol, 1) * 0.85;
 }).play;
 )
 
 
 
+
+// Minor triad loop with surprises
 (
-Ndef(\a).fadeTime = 0;
+Ndef(\a).fadeTime = 5;
 Ndef(\a, {
 	var snd;
 	var win;
 	var sample = b;
-	var trig = Impulse.ar(5);
+	var trig = Impulse.ar(10);
 
 	snd = GrainBuf.ar(
 		numChannels: 2,
 		trigger: trig,// * SinOsc.ar(1/3).range(1, 2),
-		dur: Array.rand(4, 0.9, 1),
+		dur: Array.rand(4, 0.5, 1.05),
 		sndbuf: sample,
 		rate: 1 * Env.triangle(0.4).kr(gate: Dust.kr(0.4), levelBias: 1.0),// * LFPulse.ar(1/5, 0, 0.9).range([0.5, 0.25], 1),
 		pos: Demand.ar(
 			trig: trig,
 			reset: 0,
 			// demandUGens: Dseq([0.22, 0.4, 0.67, 0.68], inf)
-			demandUGens: Dseq(Array.series(14, 0.01, 0.1), inf).min(0.99)
+			demandUGens: Dseq(Array.series(4, 0.01, 0.1), inf).min(0.99)
 		)
 		,
 		interp: 4,
@@ -99,14 +138,50 @@ Ndef(\a, {
 	);
 
 	snd = Splay.ar(snd.flat);
+	snd = Normalizer.ar(snd, 0.5, 0.01);
 	snd = FreeVerb.ar(snd, 0.4, 0.8);
-	snd = Limiter.ar(snd, 0.7)// * Ndef.ar(\vol, 1) * 0.85;
+	snd = Limiter.ar(snd)// * Ndef.ar(\vol, 1) * 0.85;
 }).play;
 )
 
 
 
-// machine music
+// machine music 1
+(
+Ndef(\a).fadeTime = 0;
+Ndef(\a, {
+	var snd;
+	var win;
+	var sample = b;
+	var trig = Impulse.ar(3);
+
+	snd = GrainBuf.ar(
+		numChannels: 2,
+		trigger: trig,
+		dur: Array.rand(4, 0.09, 0.19),
+		sndbuf: sample,
+		rate: [0.75, 1, 1.5] * LFPulse.ar(1/5, 0, 0.9).range([0.5, 0.25], 1),
+		pos: Demand.ar(
+			trig: trig,
+			reset: 0,
+			// demandUGens: Dseq([0.22, 0.4, 0.67, 0.68], inf)
+			demandUGens: Dseq([0.2, 0.4, 0.7, 0.8, 0.21], inf)
+			// demandUGens: Dshuf(Array.series(14, 0.2, 0.01), inf)
+		)
+		,
+		interp: 4,
+		pan: LFNoise0.ar(4),
+		mul: 1.5
+	);
+
+	// snd = Splay.ar(snd.flat);
+	snd = FreeVerb.ar(snd, 0.6, 0.8);
+	snd = Limiter.ar(snd)// * Ndef.ar(\vol, 1) * 0.85;
+}).play;
+Ndef(\a).quant_(1)
+)
+
+// machine music 2 rallentando
 (
 Ndef(\a).fadeTime = 2;
 Ndef(\a, {
@@ -145,7 +220,7 @@ Ndef(\a, {
 
 // cluster, mid freq, occasional low transposition
 (
-Ndef(\a).fadeTime = 5;
+Ndef(\a).fadeTime = 0.5;
 Ndef(\a, {
 	var snd;
 	var win;
@@ -170,11 +245,97 @@ Ndef(\a, {
 )
 
 
-x = {SinOsc.ar(MouseX.kr(100, 200).poll) * 0.1}.play;
 
 x.free;
 
-// sparse, low, resonant, occasional long tone
+// as above, but more staccato
+(
+Ndef(\a).fadeTime = 5;
+Ndef(\a, {
+	var snd;
+	var win;
+	var sample = b;
+
+	snd = GrainBuf.ar(
+		numChannels: 2,
+		trigger: Impulse.ar([3,5]) * SinOsc.ar(1/3).range(1, 2),
+		dur: Array.rand(4, 0.07, 0.1),
+		sndbuf: sample,
+		rate: [0.999, 1, 1.01] * LFPulse.ar(1/5, 0, 0.9).range([0.5, 0.25], 1),
+		pos: [0.22, [0.21, 0.24].choose]
+		,
+		interp: 4,
+		pan: LFNoise0.ar(4),
+		mul: 1.5
+	);
+
+	snd = snd + RHPF.ar(snd, 135 * [0, 2, 9].midiratio * 8, 0.13);
+	snd = Normalizer.ar(snd, LFNoise2.ar(1).range(0.21, 0.5), 0.1);
+	snd = FreeVerb.ar(snd, 0.54, 0.65);
+	snd = Limiter.ar(snd)// * Ndef.ar(\vol, 1) * 0.85;
+}).play;
+)
+
+// sparse, low, resonant, occasional long tone 1 (sustained)
+(
+Ndef(\a).fadeTime = 5;
+Ndef(\a, {
+	var snd;
+	var win;
+	var sample = b;
+
+	snd = GrainBuf.ar(
+		numChannels: 2,
+		trigger: Impulse.ar(5/[3,5]) * SinOsc.ar(1/3).range(1, 3),
+		dur: Array.rand(4, 0.7, 0.51) * LFPulse.ar(1/4, 0, 0.19).range(1, 4),
+		sndbuf: sample,
+		rate: [0.999, 1, 1.01] * LFPulse.ar(1/5, 0, 0.9).range([0.5, 0.25], 1) * XLine.ar(0.23, 0.2, 14),
+		pos: [0.22, [0.21, 0.24].choose]
+		,
+		interp: 4,
+		pan: LFNoise0.ar(4),
+		mul: 1.5
+	);
+
+	snd = snd + RHPF.ar(snd, 135 * [0, 2, 9].midiratio * 6, 0.5);
+	snd = FreeVerb.ar(snd, 0.54, 0.85);
+	snd = Limiter.ar(snd, 0.7)// * Ndef.ar(\vol, 1) * 0.85;
+}).play;
+)
+
+
+// gliss up, rhythmic
+(
+Ndef(\a).fadeTime = 6;
+Ndef(\a, {
+	var snd;
+	var win;
+	var sample = b;
+
+	snd = GrainBuf.ar(
+		numChannels: 2,
+		trigger: Impulse.ar([3,5] * SinOsc.ar(1/2).range(0.5, 14)),
+		dur: Array.rand(4, 0.07, 0.1) * LFPulse.ar(1/4, 0, 0.29).range(1, 4),
+		sndbuf: sample,
+		rate: [0.999, 1, 1.01] * LFPulse.ar(1/5, 0, 0.9).range([0.5, 0.25], 1) * XLine.ar(0.15, 0.39, 14),
+		pos: [0.22, [0.21, 0.24, 0.4, 0.12, 0.99].choose]
+		,
+		interp: 4,
+		pan: LFNoise0.ar(4),
+		mul: SinOsc.ar(1/[3,4]).range(0.6, 0.9) * [1, 1/1]
+	);
+
+
+	snd = snd + RHPF.ar(snd, 135 * [0, 2, 9].midiratio * 5, 0.15);
+	snd = Splay.ar(snd.flat);
+	snd = Normalizer.ar(snd, 0.5, 0.2);
+	snd = FreeVerb.ar(snd, 0.4, 0.85);
+	snd = Limiter.ar(snd)// * Ndef.ar(\vol, 1) * 0.85;
+}).play;
+)
+
+
+// sparse, low, resonant, occasional long tone STACCATO
 (
 Ndef(\a).fadeTime = 5;
 Ndef(\a, {
@@ -203,34 +364,8 @@ Ndef(\a, {
 )
 
 
-// gliss up, rhythmic
-(
-Ndef(\a).fadeTime = 6;
-Ndef(\a, {
-	var snd;
-	var win;
-	var sample = b;
-
-	snd = GrainBuf.ar(
-		numChannels: 2,
-		trigger: Impulse.ar([3,5] * SinOsc.ar(1/2).range(0.5, 14)),
-		dur: Array.rand(4, 0.07, 0.1) * LFPulse.ar(1/4, 0, 0.29).range(1, 4),
-		sndbuf: sample,
-		rate: [0.999, 1, 1.01] * LFPulse.ar(1/5, 0, 0.9).range([0.5, 0.25], 1) * XLine.ar(0.35, 0.39, 14),
-		pos: [0.22, [0.21, 0.24, 0.4, 0.12, 0.99].choose]
-		,
-		interp: 4,
-		pan: LFNoise0.ar(4),
-		mul: SinOsc.ar(1/[3,4]).range(0.6, 0.9) * [1, 1/1]
-	);
 
 
-	snd = snd + RHPF.ar(snd, 135 * [0, 2, 9].midiratio * 5, 0.25);
-	snd = Splay.ar(snd.flat);
-	snd = FreeVerb.ar(snd, 0.4, 0.85);
-	snd = Limiter.ar(snd)// * Ndef.ar(\vol, 1) * 0.85;
-}).play;
-)
 
 // mid cluster loud
 (
@@ -260,11 +395,13 @@ Ndef(\a, {
 		decaytime: [4,5],
 		mul: SinOsc.ar(1/[4,3]).range(0.3, 1.0)
 	);
-	snd = Splay.ar(snd);
+	snd = Splay.ar(snd.flat);
 	snd = FreeVerb.ar(snd, 0.4, 0.5, 0.3, 2);
 	snd = Limiter.ar(snd)// * Ndef.ar(\vol, 1) * 0.85;
 }).play;
 )
+
+
 
 // low, thick clouds
 (
@@ -294,35 +431,42 @@ Ndef(\a, {
 		decaytime: [4,2.5],
 		mul: SinOsc.ar(1/[4,3]).range(0.3, 1.0)
 	);
-	snd = RLPF.ar(snd, [440, 880, 1220] *LFNoise2.ar(1/3).range(1, 2), 0.24);
-	snd = Splay.ar(snd);
+	snd = RLPF.ar(snd, [440, 880, 1220] *LFNoise2.ar(1/3).range(3, 5), 0.124);
+	snd = Splay.ar(snd.flat);
+	snd = Normalizer.ar(snd, 0.4, 0.1);
 	snd = FreeVerb.ar(snd, 0.4, 0.5, 0.3, 1);
 	snd = Limiter.ar(snd)// * Ndef.ar(\vol, 1) * 0.85;
 }).play;
 )
 
 
-// distorted, slow moving ominous transposition upwards
-(
+
+
+
+
+
+// distorted, fast moving ominous transposition upwards
 Ndef(\vol, { Line.ar(0, 1, 10)});
+
+(
 Ndef(\a).fadeTime = 5;
 Ndef(\a, {
 	var snd, snd2;
 	var win;
 	var sample = b;
 	// var trig = [0.5, 0.75, 1.0]; //Impulse.ar(1/[2,3,6]);
-	var trig = 1/[5,9];
+	var trig = [5,9] * LFNoise0.ar(1/2).range(1/2, 2);
 	win = LFTri.ar(trig);
 	snd = PlayBuf.ar(
 		numChannels: sample.numChannels,
 		bufnum: sample,
 		rate:
-		[1, 0.25, 1, 1] * LFSaw.ar(1/10).range(1/7, 1).round(0.25)
+		[1, 0.25, 1, 1] * LFSaw.ar(1/10).range(1/4, 1).round(0.125)
 		// Array.rand(2, 0.5, 1.5).round(0.25) * SinOsc.ar(1/3).range(1, 1.04)
 		// [1, 1.25, 1.5, 11.midiratio]
 		* BufRateScale.kr(sample),
 		trigger: Impulse.ar(trig),
-		startPos: 0.1 * SinOsc.ar(1/13).range(0.49, 1.1) //LFPulse.ar(1/4).range(0, 0.01)
+		startPos: 0.1 * SinOsc.ar(1/13).range(0.049, 1.1) //LFPulse.ar(1/4).range(0, 0.01)
 		* b.numFrames,
 		loop: 1.0
 	)
@@ -338,13 +482,12 @@ Ndef(\a, {
 	);
 	*/
 	// snd = (snd * 1)  + (snd2 * LFNoise2.ar(1/5).range(0.003, 1/9));
-	snd = Splay.ar(Splay.ar(snd));
 	// snd = snd + RHPF.ar(snd, [60, 67, 70, 75].midicps, 0.1);
-	// snd = Normalizer.ar(snd, 0.15);
-	// snd = Clip.ar(snd, -0.91, LFNoise1.ar(1).range(0.14771, 0.7195));
+	snd = Normalizer.ar(snd, 0.75);
+	snd = Clip.ar(snd, -0.91, LFNoise1.ar(1).range(0.14771, 0.7195));
 	// snd = (snd * LFTri.ar(freq: 1/4, width: 0.1) * SinOsc.ar(1/5)) + (HPF.ar(snd, LFPulse.ar(4).range(1000, 5000), 2) * LFPulse.ar(freq: 1/[4, 5], width: [0.1, 0.301]));
-	snd = Splay.ar(snd);
-	snd = FreeVerb.ar(snd, 0.45, 0.9);
+	snd = Splay.ar(snd.flat);
+	snd = FreeVerb.ar(snd, 0.5, 0.19);
 	snd = Limiter.ar(snd) * Ndef.ar(\vol, 1);
 }).play;
 )
